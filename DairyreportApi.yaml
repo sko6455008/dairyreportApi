@@ -62,105 +62,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
-      description: put data
-      operationId: putDairy
-      parameters:
-        - name: id
-          in: path
-          description: dairyデータの取得
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: 全体更新するdairyデータ
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Dairy"
-      responses:
-        '200':
-          description: dairy response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Dairy'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    patch:
-      description: idを指定して一部置換
-      operationId: patchDairy
-      parameters:
-        - name: id
-          in: path
-          description: パッチしたいデータのid
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: 部分更新するamazonデータ
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DairyPatch"
-      responses:
-        '200':
-          description: amazon response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Dairy'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 components:
   schemas:
+    Task:
+      type: object
+      required:
+        - project
+        - hour
+      properties:
+        project:
+          type: string
+          enum:
+           - itemstore
+           - 社内(mtg/調査など)
+           - GC
+           - その他
+           - おしるこ
+           - 東京メトロ
+           - JRA
+           - ふれあいリズムダンス
+           - 相模屋美術店
+        hour:
+          type: number
+          format: float
     Dairy:
       type: object
       required:
-        - name
-        - day
-        - task
-        - text
-        - start
-        - finish
-        - id
+        - email
+        - date
       properties:
         id:
           type: integer
-        name:
+        email:
           type: string
-        day:
-          type: integer
-        task:
+          format: email
+        date:
           type: string
-        text:
-          type: string
-        start:
-          type: integer
-        finish:
-          type: integer
-    
-    DairyPatch:
-      type: object
-      properties:
-        name:
-          type: string
-        day:
-          type: integer
-        task:
-          type: string
-        text:
-          type: string
+          format: date
+        tasks:
+          type: array
+          items: 
+           $ref: '#/components/schemas/Task'
     Error:
       type: object
       required:
