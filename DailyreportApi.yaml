@@ -14,48 +14,48 @@ info:
 servers:
   - url: http://petstore.swagger.io/api
 paths:
-  /dairy:
+  /daily:
     post:
       description: add data
-      operationId: addDairy
+      operationId: addDaily
       requestBody:
-        description: dairy to add to the store
+        description: daily to add to the store
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Dairy'
+              $ref: '#/components/schemas/Daily'
       responses:
         '200':
-          description: dairy response
+          description: daily response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dairy'
+                $ref: '#/components/schemas/Daily'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /dairy/{id}:  
+  /daily/{id}:  
     get:
       description: get data
-      operationId: getDairy
+      operationId: getDaily
       parameters:
         - name: id
           in: path
-          description: dairyデータの取得
+          description: dailyデータの取得
           required: true
           schema:
             type: integer
       responses:
         '200':
-          description: dairy response
+          description: daily response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dairy'
+                $ref: '#/components/schemas/Daily'
         default:
           description: unexpected error
           content:
@@ -85,7 +85,7 @@ components:
         hour:
           type: number
           format: float
-    Dairy:
+    Daily:
       type: object
       required:
         - email

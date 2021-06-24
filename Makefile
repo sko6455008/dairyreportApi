@@ -17,5 +17,5 @@ install-oapi-codegen:
 	go get -u github.com/deepmap/oapi-codegen/cmd/oapi-codegen
 
 oapi-codegen:
-	oapi-codegen -generate "types" -package gen DairyreportApi.yaml > ./internal/http/gen/model.go
-	oapi-codegen -generate "server,spec" -package gen DairyreportApi.yaml > ./internal/http/gen/server.go
+	oapi-codegen -generate "types" -package gen DailyreportApi.yaml > ./internal/http/gen/model.go
+	oapi-codegen -generate "server,spec" -package gen DailyreportApi.yaml > ./internal/http/gen/server.go
