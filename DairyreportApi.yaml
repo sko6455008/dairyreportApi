@@ -1,0 +1,174 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Petstore
+  description: A sample API that uses a petstore as an example to demonstrate features in the OpenAPI 3.0 specification
+  termsOfService: http://swagger.io/terms/
+  contact:
+    name: Swagger API Team
+    email: apiteam@swagger.io
+    url: http://swagger.io
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+  - url: http://petstore.swagger.io/api
+paths:
+  /dairy:
+    post:
+      description: add data
+      operationId: addDairy
+      requestBody:
+        description: dairy to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dairy'
+      responses:
+        '200':
+          description: dairy response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dairy'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /dairy/{id}:  
+    get:
+      description: get data
+      operationId: getDairy
+      parameters:
+        - name: id
+          in: path
+          description: dairyデータの取得
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: dairy response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dairy'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      description: put data
+      operationId: putDairy
+      parameters:
+        - name: id
+          in: path
+          description: dairyデータの取得
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: 全体更新するdairyデータ
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Dairy"
+      responses:
+        '200':
+          description: dairy response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dairy'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      description: idを指定して一部置換
+      operationId: patchDairy
+      parameters:
+        - name: id
+          in: path
+          description: パッチしたいデータのid
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: 部分更新するamazonデータ
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DairyPatch"
+      responses:
+        '200':
+          description: amazon response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dairy'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Dairy:
+      type: object
+      required:
+        - name
+        - day
+        - task
+        - text
+        - start
+        - finish
+        - id
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        day:
+          type: integer
+        task:
+          type: string
+        text:
+          type: string
+        start:
+          type: integer
+        finish:
+          type: integer
+    
+    DairyPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        day:
+          type: integer
+        task:
+          type: string
+        text:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
