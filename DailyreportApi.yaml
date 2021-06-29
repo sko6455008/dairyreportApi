@@ -12,7 +12,7 @@ info:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
-  - url: http://petstore.swagger.io/api
+  - url: http://dailyreport.swagger.io/api
 paths:
   /daily:
     post:
@@ -75,11 +75,11 @@ components:
           enum:
            - itemstore
            - office
-           - GC
+           - gc
            - etc
            - oshiruco
            - metoro
-           - JRA
+           - jra
            - hureai
            - sagamiya
         hour:
