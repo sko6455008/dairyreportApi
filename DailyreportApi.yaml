@@ -74,14 +74,14 @@ components:
           type: string
           enum:
            - itemstore
-           - 社内(mtg/調査など)
+           - office
            - GC
-           - その他
-           - おしるこ
-           - 東京メトロ
+           - etc
+           - oshiruco
+           - metoro
            - JRA
-           - ふれあいリズムダンス
-           - 相模屋美術店
+           - hureai
+           - sagamiya
         hour:
           type: number
           format: float
