@@ -11,13 +11,13 @@ import (
 const (
 	TaskProjectEtc TaskProject = "etc"
 
-	TaskProjectGC TaskProject = "GC"
+	TaskProjectGc TaskProject = "gc"
 
 	TaskProjectHureai TaskProject = "hureai"
 
 	TaskProjectItemstore TaskProject = "itemstore"
 
-	TaskProjectJRA TaskProject = "JRA"
+	TaskProjectJra TaskProject = "jra"
 
 	TaskProjectMetoro TaskProject = "metoro"
 
