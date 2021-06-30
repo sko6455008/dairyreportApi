@@ -1,7 +1,7 @@
 package repository
 
 type DailyData struct {
-	Id    int
+	ID    uint64 `gorm:"primaryKey"`
 	Email string
 	Date  string
 	Tasks string

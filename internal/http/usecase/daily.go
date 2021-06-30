@@ -3,8 +3,10 @@ package usecase
 import (
 	"DailyreportApi/internal/http/gen"
 	"DailyreportApi/internal/repository"
+	"encoding/json"
 	"net/http"
 
+	"github.com/deepmap/oapi-codegen/pkg/types"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -27,12 +29,17 @@ func (p *Daily) AddDaily(ctx echo.Context) error {
 		return sendError(ctx, http.StatusBadRequest, "Invalid format")
 	}
 
-	// Create
+	// Tasksfieldをjson変換
+	s, err := json.Marshal(daily.Tasks)
+	if err != nil {
+		panic(err)
+	}
 
+	// Create
 	p.db.Create(&repository.DailyData{
-		Id:    *daily.Id,
 		Email: string(daily.Email),
 		Date:  daily.Date.Format("2006-01-02"),
+		Tasks: string(s),
 	})
 	return ctx.JSON(http.StatusCreated, daily)
 }
@@ -43,10 +50,16 @@ func (p *Daily) GetDaily(ctx echo.Context, id int) error {
 	if tx := p.db.First(m, "id = ?", id); tx.Error != nil {
 		return sendError(ctx, http.StatusNotFound, tx.Error.Error())
 	}
+
+	//jsonを構造体に変換
+	tasks := make([]gen.Task, 0)
+	b := make([]byte, 0)
+	json.Unmarshal(b, &tasks)
 	daily := &gen.Daily{
-		Id:    &m.Id,
-		Email: m.Email,
-		Date:  m.Date,
+		Email: types.Email(m.Email),
+		Date:  types.Date{},
+		Tasks: &tasks,
 	}
+
 	return ctx.JSON(http.StatusOK, daily)
 }
