@@ -30,36 +30,56 @@ func (p *Daily) AddDaily(ctx echo.Context) error {
 	}
 
 	// Tasksfieldをjson変換
-	s, err := json.Marshal(daily.Tasks)
+	taskString, err := arrayToString(ctx, daily.Tasks)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// Create
-	p.db.Create(&repository.DailyData{
+	p.db.Create(&repository.Daily{
 		Email: string(daily.Email),
-		Date:  daily.Date.Format("2006-01-02"),
-		Tasks: string(s),
+		Date:  daily.Date,
+		Tasks: taskString,
 	})
 	return ctx.JSON(http.StatusCreated, daily)
 }
 
 func (p *Daily) GetDaily(ctx echo.Context, id int) error {
 	// get data
-	m := new(repository.DailyData)
+	m := new(repository.Daily)
 	if tx := p.db.First(m, "id = ?", id); tx.Error != nil {
 		return sendError(ctx, http.StatusNotFound, tx.Error.Error())
 	}
 
 	//jsonを構造体に変換
-	tasks := make([]gen.Task, 0)
-	b := make([]byte, 0)
-	json.Unmarshal(b, &tasks)
+	taskArray, err := stringToArray(ctx, m.Tasks)
+	if err != nil {
+		return err
+	}
+
 	daily := &gen.Daily{
 		Email: types.Email(m.Email),
-		Date:  types.Date{},
-		Tasks: &tasks,
+		Date:  m.Date,
+		Tasks: taskArray,
 	}
 
 	return ctx.JSON(http.StatusOK, daily)
+}
+
+func arrayToString(ctx echo.Context, array *[]gen.Task) (string, error) {
+	b, err := json.Marshal(array)
+	if err != nil {
+		return "", sendError(ctx, http.StatusBadRequest, "Invalid format")
+	}
+	return string(b), nil
+}
+
+func stringToArray(ctx echo.Context, str string) (*[]gen.Task, error) {
+	b := []byte(str)
+	sl := make([]gen.Task, 0)
+	err := json.Unmarshal(b, &sl)
+	if err != nil {
+		return nil, sendError(ctx, http.StatusBadRequest, "Invalid format")
+	}
+	return &sl, nil
 }
