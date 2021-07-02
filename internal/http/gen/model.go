@@ -30,7 +30,7 @@ const (
 
 // Daily defines model for Daily.
 type Daily struct {
-	Date  openapi_types.Date  `json:"date"`
+	Date  string              `json:"date"`
 	Email openapi_types.Email `json:"email"`
 	Id    *int                `json:"id,omitempty"`
 	Tasks *[]Task             `json:"tasks,omitempty"`
