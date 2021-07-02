@@ -35,7 +35,7 @@ func Run() {
 		panic(err.Error())
 	}
 	// Migrate the schema
-	if err := db.AutoMigrate(&repository.DailyData{}); err != nil {
+	if err := db.AutoMigrate(&repository.Daily{}); err != nil {
 		panic(err.Error())
 	}
 	gen.RegisterHandlers(e, NewApi(db))
