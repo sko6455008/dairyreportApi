@@ -13,12 +13,16 @@ type Api struct {
 	daily *usecase.Daily
 }
 
-func (a Api) AddDaily(ctx echo.Context) error {
+func (a *Api) AddDaily(ctx echo.Context) error {
 	return a.daily.AddDaily(ctx)
 }
 
-func (a Api) GetDaily(ctx echo.Context, id int) error {
-	return a.daily.GetDaily(ctx, id)
+func (a *Api) FindDailyById(ctx echo.Context, id int64) error {
+	return a.daily.FindDailyById(ctx, id)
+}
+
+func (a *Api) FindDaily(ctx echo.Context, params gen.FindDailyParams) error {
+	return a.daily.FindDaily(ctx, params)
 }
 
 func NewApi(db *gorm.DB) *Api {

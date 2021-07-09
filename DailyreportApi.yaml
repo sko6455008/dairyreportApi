@@ -1,88 +1,109 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: Swagger Dailyreport
-  description: A sample API that uses a Dailyreport as an example to demonstrate features in the OpenAPI 3.0 specification
+  title: dailyApi
+  description: Daily API
 paths:
   /daily:
+    get:
+      description: dailyを複数取得
+      operationId: findDaily
+      parameters:
+        - name: asc
+          in: query
+          description: 昇順にするかどうか
+          required: false
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          description: 取得する件数
+          required: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: daily response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Daily"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
-      description: add data
+      description: dailyの新規作成
       operationId: addDaily
       requestBody:
-        description: daily to add to the store
+        description: 追加するdaily
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Daily'
+              $ref: "#/components/schemas/NewDaily"
       responses:
-        '200':
+        "200":
           description: daily response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Daily'
+                $ref: "#/components/schemas/Daily"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  /daily/{id}:  
+                $ref: "#/components/schemas/Error"
+  /daily/{id}:
     get:
-      description: get data
-      operationId: getDaily
+      description: dataをidを指定して取得
+      operationId: findDailyById
       parameters:
         - name: id
           in: path
-          description: dailyデータの取得
+          description: 取得したいデータのid
           required: true
           schema:
             type: integer
+            format: int64
       responses:
-        '200':
+        "200":
           description: daily response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Daily'
+                $ref: "#/components/schemas/Daily"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
-    Task:
-      type: object
-      required:
-        - project
-        - hour
-      properties:
-        project:
-          type: string
-          enum:
-           - itemstore
-           - office
-           - gc
-           - etc
-           - oshiruco
-           - metoro
-           - jra
-           - hureai
-           - sagamiya
-        hour:
-          type: number
-          format: float
     Daily:
+      allOf:
+        - $ref: "#/components/schemas/NewDaily"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              format: int64
+    NewDaily:
       type: object
       required:
         - email
         - date
+        - tasks
       properties:
-        id:
-          type: integer
         email:
           type: string
           format: email
@@ -90,8 +111,8 @@ components:
           type: string
         tasks:
           type: array
-          items: 
-           $ref: '#/components/schemas/Task'
+          items:
+            type: string
     Error:
       type: object
       required:

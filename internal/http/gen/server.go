@@ -21,16 +21,44 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (GET /daily)
+	FindDaily(ctx echo.Context, params FindDailyParams) error
+
 	// (POST /daily)
 	AddDaily(ctx echo.Context) error
 
 	// (GET /daily/{id})
-	GetDaily(ctx echo.Context, id int) error
+	FindDailyById(ctx echo.Context, id int64) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
+}
+
+// FindDaily converts echo context to params.
+func (w *ServerInterfaceWrapper) FindDaily(ctx echo.Context) error {
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params FindDailyParams
+	// ------------- Optional query parameter "asc" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "asc", ctx.QueryParams(), &params.Asc)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter asc: %s", err))
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.FindDaily(ctx, params)
+	return err
 }
 
 // AddDaily converts echo context to params.
@@ -42,11 +70,11 @@ func (w *ServerInterfaceWrapper) AddDaily(ctx echo.Context) error {
 	return err
 }
 
-// GetDaily converts echo context to params.
-func (w *ServerInterfaceWrapper) GetDaily(ctx echo.Context) error {
+// FindDailyById converts echo context to params.
+func (w *ServerInterfaceWrapper) FindDailyById(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
-	var id int
+	var id int64
 
 	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
 	if err != nil {
@@ -54,7 +82,7 @@ func (w *ServerInterfaceWrapper) GetDaily(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.GetDaily(ctx, id)
+	err = w.Handler.FindDailyById(ctx, id)
 	return err
 }
 
@@ -86,25 +114,27 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/daily", wrapper.FindDaily)
 	router.POST(baseURL+"/daily", wrapper.AddDaily)
-	router.GET(baseURL+"/daily/:id", wrapper.GetDaily)
+	router.GET(baseURL+"/daily/:id", wrapper.FindDailyById)
 
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+yUv24TQRDGX2U1UK5ik3TXBYFQKpCgi1JMbufuNrn9w+wcxLJcQApKOngLngDBw1h5",
-	"D7R7dmzHRjSIChe+1d7uzO+bb+bmUAcXgycvCao5pLojh2X5DG0/y4vIIRKLpbJtUCg/ZRYJKkjC1rew",
-	"0EAObZ/fNIEdClSrHb1/1JqtCNYLtcR5XzBdlyRWyJXFY6YGKng02WBOVoyTN5iuy60xDjLjDBYLDUxv",
-	"B8tkoDq/ZyjYF/eHw+UV1ZJvP2cOvC+zDoZ2xFgvJ8cbMVvUjlLC9lBRHrCUmJvzh2iKpj2YLgy8A9P0",
-	"AWUD4wd3ObJEDiVUNQfyg8tZSy0lcE4dmsbWedHWoIEk/4fUWR7qUMgkcF5cMYKGbmBCCxoStujsDLeQ",
-	"fyNxnV+PzPsS8wXrm1BaiVLNNooNHio4VQld7EmdvjpT0qGoIVFSqEojMsXAojAp9IpuxpMSlCEXfBJG",
-	"IdUQysCUlPVKOlIvI/kc7ORoqlKk2ja2xpJNg1jpM9fr99i2xNtJQMM74jRSPTmaHk1zZUMkj9FCBSdl",
-	"S0NE6Yo9E3M/KiHJvjI0RhmUXNLsakE4M1myMeOUjUWkJE+DmY3t54V8iYUx9ivuyVXKAddj+qcBGWOX",
-	"ku8CFd5cvUwmoRRr3SIbN4UHKvamGHwaO/F4Ov1XeOu8UN43OPTy11KPQ38g9eDpJlItZBStzyz0yuHJ",
-	"3JpFDt3SAZdbksMuvyBZuxyR0ZEQJ6jO54dkL28/LW+/Lz/+XH74dvf5y92Pr5AHBqrSbqDBoyvfH7Pn",
-	"ld4S//Artbj4b2T+/QoAAP//gKRyxvAGAAA=",
+	"H4sIAAAAAAAC/+xVT08USxD/KqTeO07YffDiYW4QNeGi3skemunapXGmu+nuVTebOcxiWCMmGBJAjYkc",
+	"DIkxIZy8KPJhmt3gtzDdvX9YZgGNHjy4h81sTdWvflX1q9o2JCKTgiM3GuI26GQVM+IfbxOWttwDSdP7",
+	"dYiX2/CvwjrE8E9lHFQZRFTu4eMQkUdtkEpIVIahR2LUfdeFyoiBGBg3t/6HCExLYviJDVSQ5xEoXG8y",
+	"hRTiZRdVGzmJlTVMDOS1PII7SgnlECezJILi5Tzzc1PyRJCh1qThvQcvtVGMN0ocPObYv8wnglHdJUKU",
+	"mGkpIsCMsHSCarBEZVdD9MPQQ4OZnoo2MBClSKtUwBDYcxnClctwYYzXhaeNOlFMGiY4xEEFMwsPllw0",
+	"M6mLos62IBlE8AiVDo7/zVZnq46PkMiJZBDDvDdFIIlZ9dwrdNipBppyLv/WdnbO33f7u8e97b3e133w",
+	"gIo4lyUKMdxlnIaGO2BFMjSotJfnJFr/VffbwaYtPtrite1s2WLLFh9ssWmLLXDVQgzrTVQOh5PMt1An",
+	"EA1W4EKrV4RIkXDX28s5AseQ4Ozzp/7u8RXQKcuYmQC/UaZ5zY1SS8F10NNctRp0zg1y3z4iZcoS35vK",
+	"mnaM2hcyjCRz3doOd/ayjPJo2nBmhoTAv6+TZmp+itN1VMJeT0nd5PhEYmKQzuDYRwp9pYaKo/7e8fnh",
+	"9tnJ2/6zlyUNLdCRhNyyoDaLgrZ+WyHjU1iu5fz0pPf8ICiGXuAQFtaoJua/OPYfmPYfP908GtyKSpvR",
+	"/JqDYYjt7DBqOzv9F93e0Rtb7Nvi8KbTsdhaojedj+Fq79vinS2e2o2u3fhiO6e2OGJ0uOXuso2X3Nsn",
+	"h3nVxk//A6z9Hb37fA8AAP//krtZ1JUIAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

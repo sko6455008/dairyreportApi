@@ -7,33 +7,12 @@ import (
 	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 )
 
-// Defines values for TaskProject.
-const (
-	TaskProjectEtc TaskProject = "etc"
-
-	TaskProjectGc TaskProject = "gc"
-
-	TaskProjectHureai TaskProject = "hureai"
-
-	TaskProjectItemstore TaskProject = "itemstore"
-
-	TaskProjectJra TaskProject = "jra"
-
-	TaskProjectMetoro TaskProject = "metoro"
-
-	TaskProjectOffice TaskProject = "office"
-
-	TaskProjectOshiruco TaskProject = "oshiruco"
-
-	TaskProjectSagamiya TaskProject = "sagamiya"
-)
-
 // Daily defines model for Daily.
 type Daily struct {
-	Date  string              `json:"date"`
-	Email openapi_types.Email `json:"email"`
-	Id    *int                `json:"id,omitempty"`
-	Tasks *[]Task             `json:"tasks,omitempty"`
+	// Embedded struct due to allOf(#/components/schemas/NewDaily)
+	NewDaily `yaml:",inline"`
+	// Embedded fields due to inline allOf schema
+	Id int64 `json:"id"`
 }
 
 // Error defines model for Error.
@@ -42,17 +21,25 @@ type Error struct {
 	Message string `json:"message"`
 }
 
-// Task defines model for Task.
-type Task struct {
-	Hour    float32     `json:"hour"`
-	Project TaskProject `json:"project"`
+// NewDaily defines model for NewDaily.
+type NewDaily struct {
+	Date  string              `json:"date"`
+	Email openapi_types.Email `json:"email"`
+	Tasks []string            `json:"tasks"`
 }
 
-// TaskProject defines model for Task.Project.
-type TaskProject string
+// FindDailyParams defines parameters for FindDaily.
+type FindDailyParams struct {
+
+	// 昇順にするかどうか
+	Asc *bool `json:"asc,omitempty"`
+
+	// 取得する件数
+	Limit *int32 `json:"limit,omitempty"`
+}
 
 // AddDailyJSONBody defines parameters for AddDaily.
-type AddDailyJSONBody Daily
+type AddDailyJSONBody NewDaily
 
 // AddDailyJSONRequestBody defines body for AddDaily for application/json ContentType.
 type AddDailyJSONRequestBody AddDailyJSONBody
