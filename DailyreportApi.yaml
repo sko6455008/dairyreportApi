@@ -1,0 +1,105 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Dailyreport
+  description: A sample API that uses a Dailyreport as an example to demonstrate features in the OpenAPI 3.0 specification
+paths:
+  /daily:
+    post:
+      description: add data
+      operationId: addDaily
+      requestBody:
+        description: daily to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Daily'
+      responses:
+        '200':
+          description: daily response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Daily'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /daily/{id}:  
+    get:
+      description: get data
+      operationId: getDaily
+      parameters:
+        - name: id
+          in: path
+          description: dailyデータの取得
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: daily response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Daily'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - project
+        - hour
+      properties:
+        project:
+          type: string
+          enum:
+           - itemstore
+           - office
+           - gc
+           - etc
+           - oshiruco
+           - metoro
+           - jra
+           - hureai
+           - sagamiya
+        hour:
+          type: number
+          format: float
+    Daily:
+      type: object
+      required:
+        - email
+        - date
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        date:
+          type: string
+        tasks:
+          type: array
+          items: 
+           $ref: '#/components/schemas/Task'
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
